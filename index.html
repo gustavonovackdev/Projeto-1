@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GuessWord</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #3c6cba;
+    background: linear-gradient(90deg,rgb(82, 83, 84) 0%, rgb(39, 41, 50) 50%, rgb(19, 21, 30) 100%);
+}
+
+#titulo {
+    display: flex;
+    justify-content: center;
+    margin: 1rem;
+    font-family: 'Noto Sans', sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-weight: 650;
+    color: #ffffff;
+}
+
+.containerInput {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 5rem;
+    gap: 1rem;
+}
+
+.inputLetra {
+    width: 4.2rem;
+    height: 4.2rem;
+    text-align: center;
+    font-size: 3rem;
+    border-radius: 0.3rem;
+    border: 0.15rem solid rgb(205, 180, 148);
+    background-color: rgba(253, 242, 242, 0.6); 
+    color: rgb(255, 255, 255);
+    font-family: 'Noto Sans', sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-weight: 900;
+    outline: none;
+    caret-color: transparent;
+    cursor: pointer;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    position: relative;
+    z-index: 1;
+    text-transform: uppercase;
+}
+
+@keyframes scaleAnimation {
+    0% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(1.2);
+    }
+}
+
+.inputLetra:focus {
+    outline: none;
+    box-shadow: 0 0 0.8rem rgb(205, 180, 148);
+    transform: scale(1.05);
+}
+
+fieldset {
+    border-style: none;
+}
+
+.keyboard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 4rem;
+}
+
+.keyboard-row {
+    display: flex;
+    gap: 0.85rem;
+}
+
+.key {
+    padding: 0.9rem 1rem;
+    border: none;
+    border-radius: 0.6rem;
+    background-color: #454547;
+    color: #ffffff;
+    font-family: 'Noto Sans', sans-serif;
+    font-weight: bold;
+    font-size: 0.9rem;
+    cursor: pointer;
+    min-width: 2rem;
+    text-align: center;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.key.enter, .key.backspace {
+    padding: 0.8rem 1.2rem;
+    min-width: 4rem;
+}
+
+.key[data-status="correta"] {
+    background-color: #538d4e; 
+    color: white;
+}
+
+.key[data-status="parcial"] {
+    background-color: #b59f3b; 
+    color: white;
+}
+
+.key[data-status="incorreta"] {
+    background-color: #3a3a3c; 
+    color: white;
+}
+
+
+.key:hover {
+    filter: brightness(90%);
+}
+
+.letra {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  margin: 2px;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 40px;
+  border: 2px solid #ccc;
+  background: white;
+  transition: transform 0.6s, background-color 0.3s;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+input {
+    transition: 0.5s;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+@keyframes flip {
+  0% {
+    transform: rotateY(0deg);
+  }
+  50% {
+    transform: rotateY(90deg);
+  }
+  100% {
+    transform: rotateY(0deg);
+  }
+}
+
+.flip {
+  animation: flip 0.5s ease-in-out forwards;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+.correta {
+  background-color: #6aaa64; /* verde */
+  color: white;
+}
+
+.incorreta {
+  background-color: #787c7e; /* cinza */
+  color: white;
+}
+
+.diferente {
+  background-color: #c9b458; /* amarelo */
+  color: white;
+}
+
+    </style>
+</head>
+<body>
+    <header>
+        <div id="titulo">
+            <h1>GuessWord</h1>
+        </div>    
+        <nav></nav>
+    </header>
+    <main>
+        <section class="containerInput">
+            <fieldset  id="primeiraTile">
+                <input type="text" class="inputLetra firstrow primeiracaixaselecionada" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra firstrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra firstrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra firstrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra firstrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+            </fieldset>
+            <fieldset disabled id="segundaTile">
+                <input type="text" class="inputLetra secondrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra secondrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra secondrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra secondrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra secondrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+            </fieldset>
+            <fieldset disabled id="terceiraTile">
+                <input type="text" class="inputLetra thirdrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra thirdrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra thirdrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra thirdrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra thirdrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+            </fieldset>
+            <fieldset disabled id="quartaTile">
+                <input type="text" class="inputLetra fourthrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra fourthrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra fourthrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra fourthrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra fourthrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+            </fieldset>
+            <fieldset disabled id="quintaTile">
+                <input type="text" class="inputLetra fifthrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra fifthrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra fifthrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra fifthrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra fifthrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+            </fieldset>
+            <fieldset disabled id="sextaTile">
+                <input type="text" class="inputLetra sixthrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra sixthrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra sixthrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra sixthrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+                <input type="text" class="inputLetra sixthrow" pattern="[a-zA-ZÀ-ÿ]" maxlength="1">   
+            </fieldset>
+        </section>
+        <div id="virtual-keyboard" class="keyboard">
+            <div class="keyboard-row" id="firstkeyboardrow">
+                <button class="key" data-key="Q">Q</button>
+                <button class="key" data-key="W">W</button>
+                <button class="key" data-key="E">E</button>
+                <button class="key" data-key="R">R</button>
+                <button class="key" data-key="T">T</button>
+                <button class="key" data-key="Y">Y</button>
+                <button class="key" data-key="U">U</button>
+                <button class="key" data-key="I">I</button>
+                <button class="key" data-key="O">O</button>
+                <button class="key" data-key="P">P</button>
+            </div>
+            <div class="keyboard-row">
+                <button class="key" data-key="A">A</button>
+                <button class="key" data-key="S">S</button>
+                <button class="key" data-key="D">D</button>
+                <button class="key" data-key="F">F</button>
+                <button class="key" data-key="G">G</button>
+                <button class="key" data-key="H">H</button>
+                <button class="key" data-key="J">J</button>
+                <button class="key" data-key="K">K</button>
+                <button class="key" data-key="L">L</button>
+                <button class="key backspace" data-key="BACKSPACE">⌫</button>
+            </div>
+            <div class="keyboard-row">
+                <button class="key" data-key="Z">Z</button>
+                <button class="key" data-key="X">X</button>
+                <button class="key" data-key="C">C</button>
+                <button class="key" data-key="V">V</button>
+                <button class="key" data-key="B">B</button>
+                <button class="key" data-key="N">N</button>
+                <button class="key" data-key="M">M</button>
+                <button class="key enter" data-key="ENTER">ENTER</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+
+    let jogoFinalizado = false;
+    function removerAcentos(str) {
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+    const inputs = document.querySelectorAll('.inputLetra');
+    const palavras = [
+        "âmago",
+        "negro",
+        "termo",
+        "êxito",
+        "mexer",
+        "nobre",
+        "senso",
+        "afeto",
+        "ética",
+        "algoz",
+        "plena",
+        "fazer",
+        "assim",
+        "tênue",
+        "mútua",
+        "sobre",
+        "aquém",
+        "vigor",
+        "seção",
+        "poder",
+        "sutil",
+        "porém",
+        "fosse",
+        "sanar",
+        "cerne",
+        "ideia",
+        "audaz",
+        "moral",
+        "inato",
+        "quiçá",
+        "desde"
+    ];
+
+    const palavraAleatoria = palavras[Math.floor(Math.random() * palavras.length)];
+    
+    const fieldsets = [
+        document.getElementById('primeiraTile'),
+        document.getElementById('segundaTile'),
+        document.getElementById('terceiraTile'),
+        document.getElementById('quartaTile'),
+        document.getElementById('quintaTile'),
+        document.getElementById('sextaTile'),
+    ];
+
+    let currentRow = 0;
+
+    function atualizarTeclado(letra, status) {
+        const botao = document.querySelector(`[data-key="${letra}"]`);
+        if (!botao) return;
+
+        const corAtual = botao.dataset.status;
+
+        if (status === 'correta') {
+            botao.style.backgroundColor = 'green';
+            botao.style.color = 'white';
+            botao.dataset.status = 'correta';
+        } else if (status === 'parcial' && corAtual !== 'correta') {
+            botao.style.backgroundColor = 'gold';
+            botao.style.color = 'black';
+            botao.dataset.status = 'parcial';
+        } else if (status === 'incorreta' && !corAtual) {
+            botao.style.backgroundColor = 'gray';
+            botao.style.color = 'white';
+            botao.dataset.status = 'incorreta';
+        }
+    }
+
+    inputs.forEach((input, index) => {
+         input.addEventListener('keydown', (e) => {
+        // BACKSPACE já está tratado antes
+        const rowInputs = Array.from(input.closest('fieldset').querySelectorAll('.inputLetra'));
+        const pos = rowInputs.indexOf(input);
+
+        if (e.key === 'ArrowRight' && pos < rowInputs.length - 1) {
+            e.preventDefault();
+            rowInputs[pos + 1].focus();
+        }
+
+        if (e.key === 'ArrowLeft' && pos > 0) {
+            e.preventDefault();
+            rowInputs[pos - 1].focus();
+        }
+    });
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace') {
+                const fieldset = input.closest('fieldset');
+                const rowInputs = Array.from(fieldset.querySelectorAll('.inputLetra'));
+                const pos = rowInputs.indexOf(input);
+
+                if (input.value === '' && pos > 0) {
+                    e.preventDefault();
+                    rowInputs[pos - 1].focus();
+                    rowInputs[pos - 1].value = '';
+                } else {
+                    input.value = '';
+                }
+            }
+        });
+        input.addEventListener('input', () => {
+            const value = input.value;
+            if (value && index < inputs.length - 1) {
+                inputs[index + 1].focus();
+            }
+        });
+    });
+
+    document.addEventListener('keydown', (e) => {
+    if (jogoFinalizado) return;
+    if (e.key === 'Enter') {
+        const currentInputs = fieldsets[currentRow].querySelectorAll('.inputLetra');
+        const allFilled = Array.from(currentInputs).every(input => input.value.trim().length === 1);
+
+        if (!allFilled) return;
+
+        const tentativa = Array.from(currentInputs).map(input => removerAcentos(input.value.toUpperCase()));
+        const letrasCorretas = removerAcentos(palavraAleatoria).toUpperCase().split('');
+        const status = Array(30).fill('');
+        const usadas = Array(30).fill(false); 
+
+        tentativa.forEach((letra, i) => {
+            if (letra === letrasCorretas[i]) {
+                status[i] = 'correta';
+                usadas[i] = true;
+            }
+        });
+
+        tentativa.forEach((letra, i) => {
+            if (status[i] === '') {
+                const indiceParcial = letrasCorretas.findIndex((l, idx) => l === letra && !usadas[idx]);
+                if (indiceParcial !== -1) {
+                    status[i] = 'parcial';
+                    usadas[indiceParcial] = true;
+                } else {
+                    status[i] = 'incorreta';
+                }
+            }
+        });
+
+        // Aplicar cores e atualizar teclado
+        let acertos = 0;
+        tentativa.forEach((letra, i) => {
+            const input = currentInputs[i];
+            setTimeout(() => {
+                input.classList.add('flip');
+                console.log(acertos)
+                if (status[i] === 'correta') {
+                    input.classList.add('correta');
+                    atualizarTeclado(letra, 'correta');
+                    acertos++;
+                } else if (status[i] === 'parcial') {
+                    input.classList.add('diferente');
+                    atualizarTeclado(letra, 'parcial');
+                } else {
+                    input.classList.add('incorreta');
+                    atualizarTeclado(letra, 'incorreta');
+                }
+
+                input.addEventListener('animationend', () => {
+                    input.classList.remove('flip');
+                }, { once: true });
+
+                if (i === tentativa.length - 1) {
+                    setTimeout(() => {
+                        if (acertos === tentativa.length) {
+                            jogoFinalizado = true;
+                            alert(`Parabéns! A palavra correta era ${palavraAleatoria}`);
+                            location.reload();
+                            fieldsets.forEach(f => f.setAttribute('disabled', true));
+                            return;
+                        } else if (currentRow === 5 && acertos != 5 ) {
+                            alert(`Tente novamente ao clicar em Ok! A palavra correta era ${palavraAleatoria}`)
+                            location.reload();
+                        }
+
+                        fieldsets[currentRow].setAttribute('disabled', true);
+                        currentRow++;
+                        fieldsets[currentRow].removeAttribute('disabled');
+                        fieldsets[currentRow].querySelector('.inputLetra').focus();
+                    }, 350);
+                }
+            }, i * 300);
+        });
+
+        // if (acertos === 5) {
+        //     setTimeout(() => {
+        //         jogoFinalizado = true;
+        //         alert(`Parabéns! A palavra correta era ${palavraAleatoria}`);
+        //         location.reload();
+        //         fieldsets.forEach(f => f.setAttribute('disabled', true));
+        //         return;
+        //     }, 300 * 5 + 100);
+        //     return;
+        // }
+
+        // if (currentRow === fieldsets.length - 1) {
+        //     setTimeout(() => {
+        //         if (acertos != 5) {
+        //             alert(`Tente novamente ao clicar em Ok, a palavra correta era ${palavraAleatoria}`);
+        //             jogoFinalizado = true;
+        //             fieldsets.forEach(f => f.setAttribute('disabled', true));
+        //             location.reload();
+        //         }
+        //     }, 300 * tentativa.length + 100);
+        //     return;
+        // }
+
+
+        // if (currentRow < fieldsets.length - 1) {
+        //     currentRow++;
+        //     fieldsets[currentRow].removeAttribute('disabled');
+        //     fieldsets[currentRow].querySelector('.inputLetra').focus();
+        // }
+
+        tentativa.forEach((letra, i) => {
+        const input = currentInputs[i];
+        setTimeout(() => {
+            input.classList.add('flip');
+
+            if (status[i] === 'correta') {
+                input.classList.add('correta');
+            } else if (status[i] === 'parcial') {
+                input.classList.add('diferente');
+            } else {
+                input.classList.add('incorreta');
+            }
+
+            input.addEventListener('transitionend', () => {
+                input.classList.remove('flip');
+            }, { once: true });
+        }, i * 300);
+    });
+    }
+});
+
+    
+    function inserirLetra(letra) {
+        const activeFieldset = fieldsets[currentRow];
+        const inputs = Array.from(activeFieldset.querySelectorAll('.inputLetra'));
+        const emptyInput = inputs.find(input => input.value === '');
+
+        if (emptyInput && /^[A-Z]$/.test(letra)) {
+            emptyInput.value = letra;
+            const nextInputIndex = inputs.indexOf(emptyInput) + 1;
+            if (nextInputIndex < inputs.length) {
+                inputs[nextInputIndex].focus();
+            }
+        }
+    }
+
+    
+    function apagarLetra() {
+    const activeFieldset = fieldsets[currentRow];
+    const inputs = Array.from(activeFieldset.querySelectorAll('.inputLetra'));
+
+    const focused = document.activeElement;
+    let pos = inputs.indexOf(focused);
+
+    if (pos === -1) {
+        // Caso nenhum input esteja focado, apaga o último preenchido
+        const lastFilled = [...inputs].reverse().find(input => input.value !== '');
+        if (lastFilled) {
+            lastFilled.value = '';
+            lastFilled.focus();
+        }
+        return;
+    }
+
+    if (inputs[pos].value !== '') {
+        inputs[pos].value = '';
+    } else if (pos > 0) {
+        inputs[pos - 1].value = '';
+        inputs[pos - 1].focus();
+    }
+    }
+
+
+    document.querySelectorAll('[data-key]').forEach(button => {
+        button.addEventListener('click', () => {
+            const key = button.dataset.key;
+            if (key === 'ENTER') {
+                const event = new KeyboardEvent('keydown', { key: 'Enter' });
+                document.dispatchEvent(event);
+            } else if (key === 'BACKSPACE') {
+                apagarLetra();
+            } else {
+                inserirLetra(key);
+            }
+        });
+    });
+
+    const inputreset = document.querySelectorAll('.inputLetra');
+    inputreset.forEach(input => {
+        input.value = '';
+        input.style.backgroundColor = '';
+        input.style.color = '';
+    });
+
+    const firstInput = document.querySelector('.primeiracaixaselecionada');
+    if (firstInput) firstInput.focus();
+    </script>
+</body>
+</html>
